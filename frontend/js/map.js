@@ -33,7 +33,7 @@ const estacionesWMS = L.tileLayer.wms(GEOSERVER, {
 viasWMS.addTo(map);
 estacionesWMS.addTo(map);
 
-// --- CHECKBOXES DEL PANEL ---
+// --- CHECKBOXES ---
 document.getElementById('chk-estaciones').addEventListener('change', function () {
     this.checked ? estacionesWMS.addTo(map) : map.removeLayer(estacionesWMS);
 });
@@ -45,7 +45,7 @@ document.getElementById('chk-satelital').addEventListener('change', function () 
     else { osm.addTo(map); satelital.remove(); }
 });
 
-// --- CAPA ESTACIONES GEOJSON (para interacción) ---
+// --- ESTACIONES GEOJSON ---
 let estacionesLayer = null;
 let estacionesData = [];
 
@@ -55,24 +55,14 @@ fetch(`${API}/estaciones`)
         estacionesData = data.features || [];
         estacionesLayer = L.geoJSON(data, {
             pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
-                radius: 8,
-                fillColor: '#E63946',
-                color: '#ffffff',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.9,
-                // Asegura que esté encima del WMS
+                radius: 8, fillColor: '#C8102E', color: '#ffffff',
+                weight: 2, opacity: 1, fillOpacity: 0.9,
                 pane: 'markerPane'
             }),
             onEachFeature: (feature, layer) => {
                 const nombre = feature.properties.nombre || 'Sin nombre';
-                layer.bindPopup(`
-                    <b>${nombre}</b><br>
-                    <small>Clic para seleccionar como punto de ruta</small>
-                `);
-                layer.on('click', () => {
-                    seleccionarEstacion(feature, layer);
-                });
+                layer.bindPopup(`<b>${nombre}</b><br><small>Clic para seleccionar como punto de ruta</small>`);
+                layer.on('click', () => seleccionarEstacion(feature, layer));
             }
         }).addTo(map);
         console.log(`✅ ${estacionesData.length} estaciones cargadas`);
@@ -83,14 +73,28 @@ fetch(`${API}/estaciones`)
 let modoBuffer = false;
 let bufferLayer = null;
 
-function activarBuffer() {
-    modoBuffer = true;
-    map.getContainer().style.cursor = 'crosshair';
+function toggleBuffer() {
+    const btn = document.getElementById('btn-buffer');
+    if (modoBuffer) {
+        modoBuffer = false;
+        map.getContainer().style.cursor = '';
+        btn.textContent = '📍 Activar buffer';
+        btn.classList.remove('btn-buffer-active');
+    } else {
+        modoBuffer = true;
+        map.getContainer().style.cursor = 'crosshair';
+        btn.textContent = '✕ Cancelar';
+        btn.classList.add('btn-buffer-active');
+    }
 }
+
 function limpiarBuffer() {
-    if (bufferLayer) map.removeLayer(bufferLayer);
+    if (bufferLayer) { map.removeLayer(bufferLayer); bufferLayer = null; }
     modoBuffer = false;
     map.getContainer().style.cursor = '';
+    const btn = document.getElementById('btn-buffer');
+    btn.textContent = '📍 Activar buffer';
+    btn.classList.remove('btn-buffer-active');
 }
 
 map.on('click', function (e) {
@@ -99,10 +103,9 @@ map.on('click', function (e) {
     if (bufferLayer) map.removeLayer(bufferLayer);
     bufferLayer = L.circle(e.latlng, {
         radius: radio, color: '#2DC653',
-        fillColor: '#2DC653', fillOpacity: 0.2
+        fillColor: '#2DC653', fillOpacity: 0.15, weight: 2
     }).addTo(map);
-    modoBuffer = false;
-    map.getContainer().style.cursor = '';
+    toggleBuffer();
 });
 
 // --- BÚSQUEDA ---
@@ -116,31 +119,26 @@ function buscarEstacion() {
             div.innerHTML = '';
             data.forEach(est => {
                 const item = document.createElement('div');
+                item.textContent = est.nombre;
                 item.onclick = () => {
                     const geo = JSON.parse(est.geojson);
                     let latlng;
-
                     if (geo.type === 'Point') {
                         latlng = [geo.coordinates[1], geo.coordinates[0]];
-
                     } else if (geo.type === 'MultiLineString') {
-                        let allCoords = [];
-                        geo.coordinates.forEach(line => line.forEach(c => allCoords.push(c)));
-                        const avgLng = allCoords.reduce((s, c) => s + c[0], 0) / allCoords.length;
-                        const avgLat = allCoords.reduce((s, c) => s + c[1], 0) / allCoords.length;
-                        latlng = [avgLat, avgLng];
-
+                        let all = [];
+                        geo.coordinates.forEach(line => line.forEach(c => all.push(c)));
+                        latlng = [
+                            all.reduce((s, c) => s + c[1], 0) / all.length,
+                            all.reduce((s, c) => s + c[0], 0) / all.length
+                        ];
                     } else if (geo.type === 'LineString') {
                         const mid = Math.floor(geo.coordinates.length / 2);
                         latlng = [geo.coordinates[mid][1], geo.coordinates[mid][0]];
                     }
-
                     if (!latlng) return;
                     map.setView(latlng, 16);
-                    L.popup()
-                        .setLatLng(latlng)
-                        .setContent(`<b>${est.nombre}</b>`)
-                        .openOn(map);
+                    L.popup().setLatLng(latlng).setContent(`<b>${est.nombre}</b>`).openOn(map);
                     registrarReporte(est.gid, est.nombre, 'busqueda');
                 };
                 div.appendChild(item);
@@ -148,5 +146,6 @@ function buscarEstacion() {
         });
 }
 
-function abrirModal(id) { document.getElementById(id).style.display = 'block'; }
-function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
+// --- MODALES ---
+function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
