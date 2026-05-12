@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor TransMilenio Bogotá</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Leaflet MiniMap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.js"></script>
+
+    <!-- Leaflet Draw (buffers, polígonos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- BARRA SUPERIOR -->
+<div id="topbar">
+    <span id="titulo">🚍 Visor TransMilenio Bogotá</span>
+    <div id="auth-area">
+        <span id="usuario-info"></span>
+        <button id="btn-login-modal" onclick="abrirModal('modal-login')">Iniciar sesión</button>
+        <button id="btn-registro-modal" onclick="abrirModal('modal-registro')">Registrarse</button>
+        <button id="btn-logout" onclick="logout()" style="display:none">Cerrar sesión</button>
+    </div>
+</div>
+
+<!-- PANEL LATERAL -->
+<div id="panel">
+    <h3>Capas</h3>
+    <label><input type="checkbox" id="chk-estaciones" checked> Estaciones</label><br>
+    <label><input type="checkbox" id="chk-vias" checked> Vías (WMS)</label><br>
+    <label><input type="checkbox" id="chk-satelital"> Satelital</label><br>
+
+    <hr>
+    <h3>Búsqueda</h3>
+    <input type="text" id="input-busqueda" placeholder="Nombre estación...">
+    <button onclick="buscarEstacion()">Buscar</button>
+    <div id="resultados-busqueda"></div>
+
+    <hr>
+    <h3>Calcular Ruta</h3>
+    <p style="font-size:11px">Haz clic en dos estaciones del mapa</p>
+    <div id="ruta-info"></div>
+    <button onclick="limpiarRuta()">Limpiar ruta</button>
+
+    <hr>
+    <h3>Análisis Espacial</h3>
+    <label>Radio buffer (m): <input type="number" id="radio-buffer" value="500" style="width:60px"></label><br><br>
+    <p style="font-size:11px">Clic en el mapa para aplicar buffer</p>
+    <button onclick="activarBuffer()">Activar Buffer</button>
+    <button onclick="limpiarBuffer()">Limpiar</button>
+</div>
+
+<!-- MAPA -->
+<div id="map"></div>
+
+<!-- LEYENDA -->
+<div id="leyenda">
+    <b>Leyenda</b><br>
+    <span style="color:#E63946">●</span> Estaciones TM<br>
+    <span style="color:#457B9D">━</span> Vías<br>
+    <span style="color:#2DC653">━</span> Ruta calculada
+</div>
+
+<!-- MODAL LOGIN -->
+<div id="modal-login" class="modal">
+    <div class="modal-content">
+        <h3>Iniciar sesión</h3>
+        <input type="email" id="login-email" placeholder="Email"><br>
+        <input type="password" id="login-password" placeholder="Contraseña"><br>
+        <button onclick="login()">Entrar</button>
+        <button onclick="cerrarModal('modal-login')">Cancelar</button>
+        <p id="login-error" style="color:red"></p>
+    </div>
+</div>
+
+<!-- MODAL REGISTRO -->
+<div id="modal-registro" class="modal">
+    <div class="modal-content">
+        <h3>Registro</h3>
+        <input type="text"     id="reg-nombre"   placeholder="Nombre"><br>
+        <input type="email"    id="reg-email"    placeholder="Email"><br>
+        <input type="password" id="reg-password" placeholder="Contraseña"><br>
+        <button onclick="registro()">Registrarse</button>
+        <button onclick="cerrarModal('modal-registro')">Cancelar</button>
+        <p id="reg-msg"></p>
+    </div>
+</div>
+
+<script src="js/map.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/rutas.js"></script>
+<script src="js/reportes.js"></script>
+</body>
+</html>

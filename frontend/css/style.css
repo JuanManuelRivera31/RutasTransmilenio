@@ -1,0 +1,76 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, sans-serif; }
+
+#topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 48px;
+    background: #1a1a2e; color: white; display: flex;
+    align-items: center; justify-content: space-between;
+    padding: 0 16px; z-index: 1000;
+}
+#titulo { font-size: 16px; font-weight: bold; }
+#auth-area button {
+    margin-left: 8px; padding: 5px 12px;
+    background: #E63946; color: white;
+    border: none; border-radius: 4px; cursor: pointer;
+}
+
+#panel {
+    position: fixed; top: 48px; left: 0; width: 220px;
+    height: calc(100vh - 48px); background: #f8f9fa;
+    padding: 12px; overflow-y: auto; z-index: 999;
+    border-right: 1px solid #dee2e6; font-size: 13px;
+}
+#panel h3 { font-size: 13px; color: #1a1a2e; margin: 8px 0 4px; }
+#panel input[type=text], #panel input[type=number] {
+    width: 100%; padding: 5px; margin: 4px 0;
+    border: 1px solid #ccc; border-radius: 4px;
+}
+#panel button {
+    width: 100%; padding: 6px; margin: 3px 0;
+    background: #1a1a2e; color: white;
+    border: none; border-radius: 4px; cursor: pointer;
+    font-size: 12px;
+}
+#panel button:hover { background: #E63946; }
+
+#map {
+    position: fixed; top: 48px; left: 220px;
+    width: calc(100vw - 220px); height: calc(100vh - 48px);
+}
+
+#leyenda {
+    position: fixed; bottom: 30px; right: 10px;
+    background: white; padding: 10px; border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    font-size: 12px; z-index: 999; line-height: 1.8;
+}
+
+.modal {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000;
+}
+.modal-content {
+    background: white; margin: 15% auto; padding: 24px;
+    width: 320px; border-radius: 8px;
+}
+.modal-content input {
+    width: 100%; padding: 8px; margin: 6px 0;
+    border: 1px solid #ccc; border-radius: 4px;
+}
+.modal-content button {
+    padding: 8px 16px; margin: 4px 2px;
+    background: #1a1a2e; color: white;
+    border: none; border-radius: 4px; cursor: pointer;
+}
+
+#resultados-busqueda div {
+    padding: 5px; margin: 2px 0; background: white;
+    border: 1px solid #dee2e6; border-radius: 4px;
+    cursor: pointer; font-size: 11px;
+}
+#resultados-busqueda div:hover { background: #E63946; color: white; }
+#ruta-info { font-size: 11px; color: #333; margin: 4px 0; min-height: 30px; }
+
+.leaflet-overlay-pane {
+    z-index: 450 !important;
+}
